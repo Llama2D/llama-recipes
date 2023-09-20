@@ -56,7 +56,6 @@ def main(**kwargs):
     print(f"Full config: {train_config=},{kwargs=}")
     dataset_config = generate_dataset_config(train_config, kwargs)
     print(f"Dataset config: {dataset_config=}")
-    raise NotImplementedError("not impl'd")
 
     use_2d = llama2d_config.use_2d
     ignore_pos_embeds = llama2d_config.ignore_pos_embeds
@@ -200,8 +199,6 @@ def main(**kwargs):
     elif not train_config.quantization and not train_config.enable_fsdp:
         model.to("cuda")
 
-    print(f"Full config: {train_config=},{kwargs=}")
-    dataset_config = generate_dataset_config(train_config, kwargs)
     print(f"Dataset config: {dataset_config=}")
 
      # Load and preprocess the dataset for training and validation
