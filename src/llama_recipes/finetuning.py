@@ -157,6 +157,7 @@ def main(**kwargs):
         )
     if train_config.use_peft:
         peft_config = generate_peft_config(train_config, kwargs)
+        print(f"PEFT config: {peft_config=}")
         model = get_peft_model(model, peft_config)
 
         # Llama2D weight initialization code
@@ -166,7 +167,7 @@ def main(**kwargs):
         if not ignore_pos_embeds:
             for k, v in model.named_parameters():
                 if k.endswith(".lbd"):
-                    v.requires_grad = v.data.requires_grad = True
+                    # v.requires_grad = v.data.requires_grad = True
                     print(k,"requires_grad=",v.requires_grad,v.data.dtype)
                 
         trainable_params_after,_ = model.get_nb_trainable_parameters()
