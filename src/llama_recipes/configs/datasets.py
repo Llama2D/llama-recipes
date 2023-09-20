@@ -35,4 +35,4 @@ class custom_dataset:
     train_split: str = "train"
     test_split: str = "validation"
 
-    ignore_pos_embeds: bool = False
+    use_2d: bool = True
