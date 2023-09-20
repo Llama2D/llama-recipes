@@ -48,8 +48,15 @@ from llama_recipes.utils.train_utils import (
 is_llama2d_enabled = True
 
 def main(**kwargs):
+
+
     # Update the configuration for the training and sharding process
     update_config((train_config, fsdp_config,llama2d_config), **kwargs)
+
+    print(f"Full config: {train_config=},{kwargs=}")
+    dataset_config = generate_dataset_config(train_config, kwargs)
+    print(f"Dataset config: {dataset_config=}")
+    raise NotImplementedError("not impl'd")
 
     use_2d = llama2d_config.use_2d
     ignore_pos_embeds = llama2d_config.ignore_pos_embeds
@@ -193,9 +200,9 @@ def main(**kwargs):
     elif not train_config.quantization and not train_config.enable_fsdp:
         model.to("cuda")
 
-    print(f"Full config: {train_config}")
+    print(f"Full config: {train_config=},{kwargs=}")
     dataset_config = generate_dataset_config(train_config, kwargs)
-    print(f"Dataset config: {dataset_config}")
+    print(f"Dataset config: {dataset_config=}")
 
      # Load and preprocess the dataset for training and validation
     dataset_train = get_preprocessed_dataset(
