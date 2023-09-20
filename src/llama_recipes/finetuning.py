@@ -16,6 +16,7 @@ from torch.distributed.fsdp.fully_sharded_data_parallel import CPUOffload
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DistributedSampler
 from transformers import (
+    Llama2DForCausalLM,
     LlamaForCausalLM,
     LlamaTokenizer,
     LlamaConfig,
@@ -23,7 +24,7 @@ from transformers import (
 )
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
 
-from llama_recipes.configs import fsdp_config, train_config
+from llama_recipes.configs import fsdp_config, train_config, llama2d_config
 from llama_recipes.policies import AnyPrecisionAdamW, apply_fsdp_checkpointing
 
 from llama_recipes.utils import fsdp_auto_wrap_policy
@@ -47,7 +48,10 @@ from llama_recipes.utils.train_utils import (
 
 def main(**kwargs):
     # Update the configuration for the training and sharding process
-    update_config((train_config, fsdp_config), **kwargs)
+    update_config((train_config, fsdp_config,llama2d_config), **kwargs)
+
+    use_2d = llama2d_config.use_2d
+    ignore_pos_embeds = llama2d_config.ignore_pos_embeds
 
     # Set the seeds for reproducibility
     torch.cuda.manual_seed(train_config.seed)
@@ -64,6 +68,11 @@ def main(**kwargs):
         torch.cuda.set_device(local_rank)
         clear_gpu_cache(local_rank)
         setup_environ_flags(rank)
+    
+    llama_cls = Llama2DForCausalLM if use_2d else LlamaForCausalLM
+    # pin_lbd means "pin the lambda gate parameter to 0"
+    # when you pin lambda to zero, you get the same behavior as llama
+    kwargs = {"pin_lbd": ignore_pos_embeds} if use_2d else {}
 
     # Load the pre-trained model and setup its configuration
     use_cache = False if train_config.enable_fsdp else None
@@ -90,14 +99,15 @@ def main(**kwargs):
             llama_config = LlamaConfig.from_pretrained(train_config.model_name)
             llama_config.use_cache = use_cache
             with torch.device("meta"):
-                model = LlamaForCausalLM(llama_config)
+                model = llama_cls(llama_config, **kwargs)
 
     else:
-        model = LlamaForCausalLM.from_pretrained(
+        model = llama_cls.from_pretrained(
             train_config.model_name,
             load_in_8bit=True if train_config.quantization else None,
             device_map="auto" if train_config.quantization else None,
             use_cache=use_cache,
+            **kwargs
         )
     if train_config.enable_fsdp and train_config.use_fast_kernels:
         """
@@ -131,7 +141,22 @@ def main(**kwargs):
     if train_config.use_peft:
         peft_config = generate_peft_config(train_config, kwargs)
         model = get_peft_model(model, peft_config)
+
+        # Llama2D weight initialization code
+
+        trainable_params_before, _ = model.get_nb_trainable_parameters()
+
+        for k, v in model.named_parameters():
+            if k.endswith(".lbd"):
+                v.requires_grad = v.data.requires_grad = True
+                print(k,"requires_grad=",v.requires_grad)
+                
+        trainable_params_after,_ = model.get_nb_trainable_parameters()
+        assert (use_2d and not ignore_pos_embeds) == (trainable_params_after > trainable_params_before),f"Looks like lambda gating parameter isn't marked as trainable. Before: {trainable_params_before}, after: {trainable_params_after}"
+
         model.print_trainable_parameters()
+    else:
+        raise NotImplementedError("Full-param fine-tuning is not supported for llama 2d yet.")
 
     #setting up FSDP if enable_fsdp is enabled
     if train_config.enable_fsdp:
