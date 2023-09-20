@@ -30,7 +30,7 @@ def load_module_from_py_file(py_file: str) -> object:
 
 def get_custom_dataset(dataset_config, tokenizer, split: str):
 
-    print(f"Is 2d? {dataset_config.is_2d}")
+    print(f"Is 2d? {dataset_config.use_2d}")
 
     if ":" in dataset_config.file:
         module_path, func_name = dataset_config.file.split(":")
