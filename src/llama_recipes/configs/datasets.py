@@ -34,3 +34,5 @@ class custom_dataset:
     file: str = "examples/custom_dataset.py"
     train_split: str = "train"
     test_split: str = "validation"
+
+    ignore_pos_embeds: bool = False

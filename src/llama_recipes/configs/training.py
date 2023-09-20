@@ -36,6 +36,12 @@ class train_config:
     use_fast_kernels: bool = False # Enable using SDPA from PyTroch Accelerated Transformers, make use Flash Attention and Xformer memory-efficient kernels
     fsdp_peft_cpu_offload_for_save: bool = False # Offload to CPU while aggregating sharded state dict into rank0 when saving PEFT
 
+    # use llama2d instead of llama
+    use_2d:bool = False
+
+    # when this is set to true, llama2d will ignore the positional embeddings. It should hopefully act just like llama.
+    ignore_pos_embeds:bool = False
+
     
     
     

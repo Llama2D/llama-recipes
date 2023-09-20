@@ -24,7 +24,7 @@ from transformers import (
 )
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
 
-from llama_recipes.configs import fsdp_config, train_config, llama2d_config
+from llama_recipes.configs import fsdp_config, train_config
 from llama_recipes.policies import AnyPrecisionAdamW, apply_fsdp_checkpointing
 
 from llama_recipes.utils import fsdp_auto_wrap_policy
@@ -51,14 +51,14 @@ def main(**kwargs):
 
 
     # Update the configuration for the training and sharding process
-    update_config((train_config, fsdp_config,llama2d_config), **kwargs)
+    update_config((train_config, fsdp_config), **kwargs)
 
     print(f"Full config: {train_config=},{kwargs=}")
     dataset_config = generate_dataset_config(train_config, kwargs)
     print(f"Dataset config: {dataset_config=}")
 
-    use_2d = llama2d_config.use_2d
-    ignore_pos_embeds = llama2d_config.ignore_pos_embeds
+    use_2d = train_config.use_2d
+    ignore_pos_embeds = train_config.ignore_pos_embeds
 
     # Set the seeds for reproducibility
     torch.cuda.manual_seed(train_config.seed)
