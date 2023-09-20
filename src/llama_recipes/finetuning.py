@@ -145,7 +145,7 @@ def main(**kwargs):
     if train_config.enable_fsdp and fsdp_config.pure_bf16:
         print("Converting to bfloat16")
         model.to(torch.bfloat16)
-        model.model.pos_embedder.to(torch.float16)
+        # model.model.pos_embedder.to(torch.bfloat16)
 
     # Load the tokenizer and add special tokens
     tokenizer = AutoTokenizer.from_pretrained(train_config.model_name)
