@@ -95,12 +95,17 @@ def main(**kwargs):
                 load_in_8bit=True if train_config.quantization else None,
                 device_map="auto" if train_config.quantization else None,
                 use_cache=use_cache,
+                **kwargs
             )
         else:
             llama_config = LlamaConfig.from_pretrained(train_config.model_name)
             llama_config.use_cache = use_cache
+
+            if use_2d:
+                llama_config.pin_lbd = ignore_pos_embeds
+
             with torch.device("meta"):
-                model = llama_cls(llama_config, **kwargs)
+                model = llama_cls(llama_config)
 
     else:
         model = llama_cls.from_pretrained(
