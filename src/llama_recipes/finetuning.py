@@ -115,6 +115,9 @@ def main(**kwargs):
             use_cache=use_cache,
             **kwargs
         )
+    
+    print(f"Using model type: {type(model)}")
+
     if train_config.enable_fsdp and train_config.use_fast_kernels:
         """
         For FSDP and FSDP+PEFT, setting 'use_fast_kernels' will enable
