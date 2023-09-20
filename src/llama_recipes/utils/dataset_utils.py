@@ -30,7 +30,7 @@ def load_module_from_py_file(py_file: str) -> object:
 
 def get_custom_dataset(dataset_config, tokenizer, split: str):
 
-    print(f"Is pos embeds ignored? {dataset_config.ignore_pos_embeds}")
+    print(f"Is 2d? {dataset_config.is_2d}")
 
     if ":" in dataset_config.file:
         module_path, func_name = dataset_config.file.split(":")
