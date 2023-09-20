@@ -161,10 +161,11 @@ def main(**kwargs):
 
         trainable_params_before, _ = model.get_nb_trainable_parameters()
 
-        for k, v in model.named_parameters():
-            if k.endswith(".lbd"):
-                v.requires_grad = v.data.requires_grad = True
-                print(k,"requires_grad=",v.requires_grad)
+        if not ignore_pos_embeds:
+            for k, v in model.named_parameters():
+                if k.endswith(".lbd"):
+                    v.requires_grad = v.data.requires_grad = True
+                    print(k,"requires_grad=",v.requires_grad)
                 
         trainable_params_after,_ = model.get_nb_trainable_parameters()
         assert (use_2d and not ignore_pos_embeds) == (trainable_params_after > trainable_params_before),f"Looks like lambda gating parameter isn't marked as trainable. Before: {trainable_params_before}, after: {trainable_params_after}"
