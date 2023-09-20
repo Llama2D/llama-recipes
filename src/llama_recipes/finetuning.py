@@ -193,6 +193,7 @@ def main(**kwargs):
     elif not train_config.quantization and not train_config.enable_fsdp:
         model.to("cuda")
 
+    print(f"Full config: {train_config}")
     dataset_config = generate_dataset_config(train_config, kwargs)
     print(f"Dataset config: {dataset_config}")
 
