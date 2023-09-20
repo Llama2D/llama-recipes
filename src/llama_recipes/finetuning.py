@@ -45,6 +45,7 @@ from llama_recipes.utils.train_utils import (
     get_policies
 )
 
+raise NotImplementedError("This recipe is not yet ready for use.")
 
 def main(**kwargs):
     # Update the configuration for the training and sharding process
