@@ -38,6 +38,7 @@ def get_custom_dataset(dataset_config, tokenizer, split: str):
         raise ValueError(f"Dataset file {module_path} is not a .py file.")
     
     module_path = Path(module_path)
+    raise NotImplementedError("module path: {dataset_config=}")
     if not module_path.is_file():
         raise FileNotFoundError(f"Dataset py file {module_path.as_posix()} does not exist or is not a file.")
     
