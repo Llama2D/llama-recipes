@@ -20,6 +20,7 @@ from transformers import (
     default_data_collator,
 )
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
+from transformers.models.llama.sam_embed import PositionEmbeddingRandom
 
 from llama_recipes.configs import fsdp_config, train_config
 from llama_recipes.policies import AnyPrecisionAdamW, apply_fsdp_checkpointing
@@ -162,16 +163,20 @@ def main(Llama,LlamaCfg,**kwargs):
             for k, v in model.named_parameters():
                 if k.endswith(".lbd"):
                     v.requires_grad = v.data.requires_grad = True
-                    print(k,"requires_grad=",v.requires_grad,v.data.dtype)
+                    print(k,"requires_grad=",v.requires_grad,v)
                 
         trainable_params_after,_ = model.get_nb_trainable_parameters()
         assert (use_2d and not ignore_pos_embeds) == (trainable_params_after > trainable_params_before),f"Looks like lambda gating parameter isn't marked as trainable. Before: {trainable_params_before}, after: {trainable_params_after}"
 
         model.print_trainable_parameters()
     else:
-        raise NotImplementedError("Full-param fine-tuning is not supported for llama 2d yet.")
-    
-
+        if not ignore_pos_embeds:
+            print(f"--------IGNORE POS EMBEDS IS FALSE--------")
+            for k, v in model.named_parameters():
+                if k.endswith(".lbd"):
+                    v.requires_grad = v.data.requires_grad = True
+                    print(k,"requires_grad=",v.requires_grad,v.data.dtype)
+                
 
     #setting up FSDP if enable_fsdp is enabled
     if train_config.enable_fsdp:
@@ -180,7 +185,7 @@ def main(Llama,LlamaCfg,**kwargs):
             freeze_transformer_layers(train_config.num_freeze_layers)
 
         mixed_precision_policy, wrapping_policy = get_policies(fsdp_config, rank)
-        my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, LlamaDecoderLayer)
+        my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, LlamaDecoderLayer, PositionEmbeddingRandom)
 
         model = FSDP(
             model,
