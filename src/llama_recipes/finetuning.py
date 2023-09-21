@@ -101,6 +101,7 @@ def main(**kwargs):
                 load_in_8bit=True if train_config.quantization else None,
                 device_map="auto" if train_config.quantization else None,
                 use_cache=use_cache,
+                pin_lbd=ignore_pos_embeds,
                 **kwargs
             )
         else:
