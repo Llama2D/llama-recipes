@@ -107,8 +107,7 @@ def main(**kwargs):
             llama_config = LlamaConfig.from_pretrained(train_config.model_name)
             llama_config.use_cache = use_cache
 
-            if use_2d:
-                llama_config.pin_lbd = ignore_pos_embeds
+            llama_config.pin_lbd = ignore_pos_embeds
 
             with torch.device("meta"):
                 model = llama_cls(llama_config)
@@ -145,7 +144,6 @@ def main(**kwargs):
     if train_config.enable_fsdp and fsdp_config.pure_bf16:
         print("Converting to bfloat16")
         model.to(torch.bfloat16)
-        # model.model.pos_embedder.to(torch.bfloat16)
 
     # Load the tokenizer and add special tokens
     tokenizer = AutoTokenizer.from_pretrained(train_config.model_name)
