@@ -109,7 +109,8 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
                         optimizer.step()
                         optimizer.zero_grad()
                         pbar.update(1)
-
+                    
+                wandb.log({"epoch": epoch, "step": step, "loss": train_epoch_loss})
                 pbar.set_description(f"Training Epoch: {epoch+1}/{train_config.num_epochs}, step {step}/{len(train_dataloader)} completed (loss: {loss.detach().float()})")
             pbar.close()
                 
@@ -126,7 +127,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
         train_prep.append(train_perplexity)
         train_loss.append(train_epoch_loss)
 
-        wandb.log({"loss": train_epoch_loss})
+        # wandb.log({"epoch": epoch, "loss": train_epoch_loss})
         
         if train_config.enable_fsdp:
             if rank==0:
