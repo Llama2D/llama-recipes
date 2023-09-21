@@ -161,7 +161,7 @@ def main(Llama,LlamaCfg,**kwargs):
             print(f"--------IGNORE POS EMBEDS IS FALSE--------")
             for k, v in model.named_parameters():
                 if k.endswith(".lbd"):
-                    # v.requires_grad = v.data.requires_grad = True
+                    v.requires_grad = v.data.requires_grad = True
                     print(k,"requires_grad=",v.requires_grad,v.data.dtype)
                 
         trainable_params_after,_ = model.get_nb_trainable_parameters()
