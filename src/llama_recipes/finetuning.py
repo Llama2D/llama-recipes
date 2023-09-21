@@ -16,10 +16,7 @@ from torch.distributed.fsdp.fully_sharded_data_parallel import CPUOffload
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DistributedSampler
 from transformers import (
-    Llama2DForCausalLM,
-    LlamaForCausalLM,
     AutoTokenizer,
-    LlamaConfig,
     default_data_collator,
 )
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
@@ -45,9 +42,7 @@ from llama_recipes.utils.train_utils import (
     get_policies
 )
 
-is_llama2d_enabled = True
-
-def main(**kwargs):
+def main(Llama,LlamaCfg,**kwargs):
 
 
     # Update the configuration for the training and sharding process
@@ -76,10 +71,9 @@ def main(**kwargs):
         clear_gpu_cache(local_rank)
         setup_environ_flags(rank)
     
-    llama_cls = Llama2DForCausalLM if use_2d else LlamaForCausalLM
     # pin_lbd means "pin the lambda gate parameter to 0"
     # when you pin lambda to zero, you get the same behavior as llama
-    kwargs = {"pin_lbd": ignore_pos_embeds} if use_2d else {}
+    kwargs = {"pin_lbd": ignore_pos_embeds}
 
     # Load the pre-trained model and setup its configuration
     use_cache = False if train_config.enable_fsdp else None
@@ -96,7 +90,7 @@ def main(**kwargs):
             raise Exception("latest pytorch nightly build is required to run with low_cpu_fsdp config, "
                             "please install latest nightly.")
         if rank == 0:
-            model = llama_cls.from_pretrained(
+            model = Llama.from_pretrained(
                 train_config.model_name,
                 load_in_8bit=True if train_config.quantization else None,
                 device_map="auto" if train_config.quantization else None,
@@ -105,16 +99,16 @@ def main(**kwargs):
                 **kwargs
             )
         else:
-            llama_config = LlamaConfig.from_pretrained(train_config.model_name)
+            llama_config = LlamaCfg.from_pretrained(train_config.model_name)
             llama_config.use_cache = use_cache
 
             llama_config.pin_lbd = ignore_pos_embeds
 
             with torch.device("meta"):
-                model = llama_cls(llama_config)
+                model = Llama(llama_config)
 
     else:
-        model = llama_cls.from_pretrained(
+        model = Llama.from_pretrained(
             train_config.model_name,
             load_in_8bit=True if train_config.quantization else None,
             device_map="auto" if train_config.quantization else None,
@@ -164,6 +158,7 @@ def main(**kwargs):
         trainable_params_before, _ = model.get_nb_trainable_parameters()
 
         if not ignore_pos_embeds:
+            print(f"--------IGNORE POS EMBEDS IS FALSE--------")
             for k, v in model.named_parameters():
                 if k.endswith(".lbd"):
                     # v.requires_grad = v.data.requires_grad = True
