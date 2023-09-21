@@ -73,7 +73,7 @@ def main(Llama,LlamaCfg,**kwargs):
     
     # pin_lbd means "pin the lambda gate parameter to 0"
     # when you pin lambda to zero, you get the same behavior as llama
-    kwargs = {"pin_lbd": ignore_pos_embeds, "use_2d": use_2d}
+    kwargs = {"pin_lbd": ignore_pos_embeds, "use_2d": use_2d} if use_2d else {}
 
     # Load the pre-trained model and setup its configuration
     use_cache = False if train_config.enable_fsdp else None
