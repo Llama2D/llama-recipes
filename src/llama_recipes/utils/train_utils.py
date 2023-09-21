@@ -152,6 +152,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
                     if not train_config.enable_fsdp or rank == 0:
                         print(f"PEFT modules are saved in {train_config.output_dir} directory")
                 else:
+                    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, StateDictType, FullStateDictConfig
                     if not train_config.use_peft and fsdp_config.checkpoint_type == StateDictType.FULL_STATE_DICT:
                         
                         save_model_checkpoint(
