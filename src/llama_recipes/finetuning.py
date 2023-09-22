@@ -297,6 +297,14 @@ def main(Llama,LlamaCfg,**kwargs):
     )
     if not train_config.enable_fsdp or rank==0:
         [print(f'Key: {k}, Value: {v}') for k, v in results.items()]
+    
+
+    # print lambda values
+    print("-----Lambda gating values-------")
+    for k, v in model.named_parameters():
+        if k.endswith(".lbd"):
+            print(k,v.data)
+    print("--------------------------------")
 
 if __name__ == "__main__":
     fire.Fire(main)
