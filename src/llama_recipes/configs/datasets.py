@@ -36,3 +36,5 @@ class custom_dataset:
     test_split: str = "validation"
 
     use_2d: bool = True
+
+    keep_fraction: float = 1.0
