@@ -41,6 +41,8 @@ class train_config:
     # when this is set to true, llama2d will ignore the positional embeddings. It should hopefully act just like llama.
     ignore_pos_embeds:bool = True
 
+    lambda_lr: float=1e-4
+
     target_modules=["q_proj","v_proj","lbd"]
 
     
