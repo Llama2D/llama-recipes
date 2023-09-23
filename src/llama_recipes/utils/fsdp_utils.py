@@ -18,6 +18,11 @@ def fsdp_auto_wrap_policy(model, *transformer_layer_names):
             print("Found lambda!")
             return True
         if (
+            getattr(module,"pos_embed_name",None) is not None
+        ):
+            print("Found pos_embed!")
+            return True
+        if (
             len(list(module.named_children())) == 0
             and getattr(module, "weight", None) is not None
             and module.weight.requires_grad
