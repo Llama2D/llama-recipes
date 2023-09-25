@@ -38,3 +38,5 @@ class custom_dataset:
     use_2d: bool = True
 
     keep_fraction: float = 1.0
+
+    dataset_folder: str = "cached-pretrain"
