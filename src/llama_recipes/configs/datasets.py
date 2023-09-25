@@ -28,6 +28,7 @@ class alpaca_dataset:
     data_path: str = "src/llama_recipes/datasets/alpaca_data.json"
     
     
+from typing import Optional
 @dataclass
 class custom_dataset:
     dataset: str = "custom_dataset"
@@ -40,3 +41,5 @@ class custom_dataset:
     keep_fraction: float = 1.0
 
     dataset_folder: str = "cached-pretrain"
+
+    repo: Optional[str] = None
