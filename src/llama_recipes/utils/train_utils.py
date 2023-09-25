@@ -64,6 +64,21 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
     checkpoint_times = []
     results = {}
     best_val_loss = float("inf")
+    print('Eyo, we in the train function')
+
+    import wandb
+    wandb.login(key=os.environ["WANDB_API_KEY"])
+
+    run = wandb.init(
+        entity='llama2d',
+        # Set the project where this run will be logged
+        project="training",
+        # Track hyperparameters and run metadata
+        config = {
+            "epochs": train_config.num_epochs,
+        }
+    )
+
     for epoch in range(train_config.num_epochs):
         epoch_start_time = time.perf_counter()
         with MemoryTrace() as memtrace:  # track the memory usage
@@ -96,8 +111,10 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
                         optimizer.step()
                         optimizer.zero_grad()
                         pbar.update(1)
-
+                    
                 pbar.set_description(f"Training Epoch: {epoch+1}/{train_config.num_epochs}, step {step}/{len(train_dataloader)} completed (loss: {loss.detach().float()})")
+                wandb.log({"epoch": epoch, "loss": loss.detach().float()})
+
             pbar.close()
                 
         epoch_end_time = time.perf_counter()-epoch_start_time
@@ -112,6 +129,8 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
         
         train_prep.append(train_perplexity)
         train_loss.append(train_epoch_loss)
+
+        # wandb.log({"epoch": epoch, "loss": train_epoch_loss})
         
         if train_config.enable_fsdp:
             if rank==0:
@@ -211,7 +230,9 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
     #saving the training params including fsdp setting for reference.
     if train_config.enable_fsdp and not train_config.use_peft:
         save_train_params(train_config, fsdp_config, rank)
-        
+    
+    run.log_code()
+
     return results
 
 def evaluation(model,train_config, eval_dataloader, local_rank, tokenizer):
