@@ -42,6 +42,7 @@ class train_config:
     ignore_pos_embeds:bool = True
 
     lambda_lr: float=1e-4
+    lbd_start_value: float=0.0
 
     target_modules=["q_proj","v_proj","lbd"]
 
