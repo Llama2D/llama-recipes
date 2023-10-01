@@ -98,7 +98,10 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
                     else:
                         batch[key] = batch[key].to('cuda:0')              
                 
-                raise Exception(f"Calling model: {batch.keys()}")
+                if "coords" in batch and not train_config.use_2d:
+                    del batch["coords"]
+                
+                # raise Exception(f"Calling model: {batch.keys()}")
                 loss = model(**batch).loss
                 loss = loss / gradient_accumulation_steps
                 total_loss += loss.detach().float()
