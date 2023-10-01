@@ -66,18 +66,19 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
     best_val_loss = float("inf")
     print('Eyo, we in the train function')
 
-    import wandb
-    wandb.login(key=os.environ["WANDB_API_KEY"])
+    if False:
+        import wandb
+        wandb.login(key=os.environ["WANDB_API_KEY"])
 
-    run = wandb.init(
-        entity='llama2d',
-        # Set the project where this run will be logged
-        project="training",
-        # Track hyperparameters and run metadata
-        config = {
-            "epochs": train_config.num_epochs,
-        }
-    )
+        run = wandb.init(
+            entity='llama2d',
+            # Set the project where this run will be logged
+            project="training",
+            # Track hyperparameters and run metadata
+            config = {
+                "epochs": train_config.num_epochs,
+            }
+        )
 
     print("Starting run")
 
