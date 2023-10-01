@@ -80,10 +80,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
             }
         )
 
-    print("Starting run")
-
     for epoch in range(train_config.num_epochs):
-        print("Starting epoch",epoch)
         epoch_start_time = time.perf_counter()
         with MemoryTrace() as memtrace:  # track the memory usage
             model.train()
@@ -91,7 +88,6 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
             total_length = len(train_dataloader)//gradient_accumulation_steps
             pbar = tqdm(colour="blue", desc=f"Training Epoch: {epoch+1}", total=total_length, dynamic_ncols=True)
             for step, batch in enumerate(train_dataloader):
-                print("Step")
                 for key in batch.keys():
                     if train_config.enable_fsdp:
                         batch[key] = batch[key].to(local_rank)
