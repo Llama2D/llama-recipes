@@ -69,10 +69,16 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
     import wandb
     wandb.login(key=os.environ["WANDB_API_KEY"])
 
+    # get random name
+    import secrets
+    name = f"{train_config.name}-{secrets.token_hex(3)}"
+
     run = wandb.init(
         entity='llama2d',
         # Set the project where this run will be logged
         project="training",
+        group=train_config.group,
+        name=name,
         # Track hyperparameters and run metadata
         config = {
             "epochs": train_config.num_epochs,
@@ -156,6 +162,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
           
         if train_config.run_validation:
             eval_ppl, eval_epoch_loss = evaluation(model, train_config, eval_dataloader, local_rank, tokenizer)
+            wandb.log({"epoch": epoch, "eval_loss": eval_epoch_loss})
             checkpoint_start_time = time.perf_counter()
             if train_config.save_model and eval_epoch_loss < best_val_loss:
                 if train_config.enable_fsdp:

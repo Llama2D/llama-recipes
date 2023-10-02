@@ -45,6 +45,6 @@ class train_config:
 
     target_modules=["q_proj","v_proj","lbd"]
 
-    
-    
-    
+    # wandb args
+    group:str=None
+    name:str=None
