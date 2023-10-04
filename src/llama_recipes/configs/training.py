@@ -42,8 +42,10 @@ class train_config:
 
     lambda_lr: float=3e-4
     lbd_start_value: float=0.0
+
     use_point_embed: bool=True
     point_embed_lr: float=3e-4
+    separate_point_embed: bool=False
 
     target_modules=["q_proj","v_proj","lbd"]
 
