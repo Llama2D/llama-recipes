@@ -40,8 +40,10 @@ class train_config:
     use_2d:bool = False
     # when this is set to true, llama2d will ignore the positional embeddings. It should hopefully act just like llama.
 
-    lambda_lr: float=1e-4
+    lambda_lr: float=3e-4
     lbd_start_value: float=0.0
+    use_point_embed: bool=True
+    point_embed_lr: float=3e-4
 
     target_modules=["q_proj","v_proj","lbd"]
 
