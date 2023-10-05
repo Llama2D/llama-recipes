@@ -75,8 +75,8 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
 
     # get config as dict
     config_dict = {
-        "train_config": train_config.__dict__,
-        "model_config": model.config.__dict__,
+        "train_config": dict(train_config.__dict__),
+        "model_config": dict(model.config.__dict__),
     }
 
     run = wandb.init(
