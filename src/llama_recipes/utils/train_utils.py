@@ -73,6 +73,12 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
     import secrets
     name = f"{train_config.name}-{secrets.token_hex(3)}"
 
+    # get config as dict
+    config_dict = {
+        "train_config": train_config.__dict__,
+        "model_config": model.config.__dict__,
+    }
+
     run = wandb.init(
         entity='llama2d',
         # Set the project where this run will be logged
@@ -80,9 +86,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
         group=train_config.group,
         name=name,
         # Track hyperparameters and run metadata
-        config = {
-            "epochs": train_config.num_epochs,
-        }
+        config = config_dict,
     )
 
     for epoch in range(train_config.num_epochs):
