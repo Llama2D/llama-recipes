@@ -43,3 +43,4 @@ class custom_dataset:
     dataset_folder: str = "cached-pretrain"
 
     repo: Optional[str] = None
+    version: Optional[str] = None
