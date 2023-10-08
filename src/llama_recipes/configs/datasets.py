@@ -44,3 +44,5 @@ class custom_dataset:
 
     repo: Optional[str] = None
     version: Optional[str] = None
+
+    seed: int = 0
